@@ -10,7 +10,7 @@ This bot reads all the tweets about a certain stock/stocks and weighs its influe
 Text from every tweet will run through sentiment analysis and it will deterine if the tweet's HypeScore(Based on the influence) should be added or subtracted to the overall hypescore of that stock.\
 All hypescores are sorted and written into a 'TickerScore' file 
 
-### Seller bot
+### Seller bot   
 Tracks the live prices of the stocks. \
 This bot checks the existing stocks in our portfolio and determines when to sell them using a stop-loss that is defined in the configuration file.
 
