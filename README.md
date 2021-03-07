@@ -2,7 +2,7 @@
 ## Overview of the project
 This project is about how social media affects the stockmarket and if it can be a profitable source of information to base a trading bot on.
 
-## Architecture 
+## Architecture  
 This project is made up of several components. 
 
 ### Twitter Analyzer Bot
