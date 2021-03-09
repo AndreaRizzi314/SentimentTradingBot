@@ -12,11 +12,7 @@ List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
 
 
- 
-
-
-
-                                                                                                                                                                                             
+                                                                                                                                                                    
 class StdOutListener(StreamListener):
     def on_data(self, data):
         print(data)
