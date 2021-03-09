@@ -2,10 +2,11 @@ from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
 import json
-ACCESS_TOKEN = "1266316636417597441-7af7z1PJTOJyedrXW6YssFBTewiguX"
-ACCESS_TOKEN_SECRET = "Jftf5rmkEXYewC2MEqfjJTfwVIigW2rLtT4xLx9jcDL0Y"
-CONSUMER_KEY = "6Eopq3NQLbDFwsOEXQaEAcr1k"
-CONSUMER_SECRET = "oQziCsy97HPoOnbvlLOkYw38ad7VjcB7oCwPzEZjKb46FYsDRW"
+import os
+ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
+ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
+CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
+CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 h = 0
 List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
@@ -15,24 +16,24 @@ List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
 
 
-
+                                                                                                                                                                                             
 class StdOutListener(StreamListener):
     def on_data(self, data):
         print(data)
         global h
-        
-        
+
+
         # HypeScore Formula (Per/Tweet) = UserFollowers / 100
         Object = json.loads(data)
         user = Object['user'] 
         h = (Object['text'])
         # h = (h + (user['followers_count'])/100)
         print (h)
-        
+
 
 
         return True
-        
+
 
 
     def on_error(self, status):
@@ -44,7 +45,7 @@ if __name__ == "__main__":
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
-    
+
     # ############################################
     # with open('Bot/S&P500Tickers.txt') as f:
     #     lines = f.readlines(1663)
@@ -61,5 +62,3 @@ if __name__ == "__main__":
 
 
     stream.filter(track=['Tesla', 'Microsoft', 'Google'])
-    
-    
