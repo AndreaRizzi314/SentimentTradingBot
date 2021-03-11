@@ -43,7 +43,7 @@ if __name__ == "__main__":
     stream = Stream(auth, listener)
 
     ############################################
-    with open(r'Research\Nasdaq100Tickers.txt', 'r') as f:
+    with open(r'Research\MoreTickers.txt', 'r') as f:
         lines = f.readlines(1663)
 
         lines = [x.strip() for x in lines]
