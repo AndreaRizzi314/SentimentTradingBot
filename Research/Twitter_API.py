@@ -42,19 +42,19 @@ if __name__ == "__main__":
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
 
-    # ############################################
-    # with open('Bot/S&P500Tickers.txt') as f:
-    #     lines = f.readlines(1663)
+    ############################################
+    with open(r'Research\Nasdaq100Tickers.txt', 'r') as f:
+        lines = f.readlines(1663)
 
-    # lines = [x.strip() for x in lines]
-    # string = '#'
-    # my_new_list = [string + x for x in lines]
-
-
-    # print(my_new_list)
-    # ############################################
+        lines = [x.strip() for x in lines]
+        string = '#'
+        my_new_list = [string + x for x in lines]
 
 
+    print(my_new_list)
+    ############################################
 
 
-    stream.filter(track=['Tesla', 'Microsoft', 'Google'])
+
+
+    stream.filter(track=lines)
