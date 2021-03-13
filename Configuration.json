@@ -1,1 +1,5 @@
-{"Hypescore_Formula": 1000, "Risk_Tolerance": 1, "Stop_Loss": 2}
+{
+    "Hypescore_Formula": 1000,
+    "Risk_Tolerance": 1,
+    "Stop_Loss": 2
+}
