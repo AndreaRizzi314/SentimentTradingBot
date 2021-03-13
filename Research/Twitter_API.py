@@ -7,7 +7,7 @@ ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
-h = 0
+
 List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
 
@@ -19,14 +19,42 @@ class StdOutListener(StreamListener):
         global h
 
 
-        # HypeScore Formula (Per/Tweet) = UserFollowers / 100
         Object = json.loads(data)
         user = Object['user'] 
-        h = (Object['text'])
-        # h = (h + (user['followers_count'])/100)
-        print (h)
+        text = (Object['text'])
+        followers = user['followers_count']
+        
+        #Determining the influence factor
+        with open('Configuration.json', 'r') as f:
+            Data = f.read()
+            Object = json.loads(Data) 
+        Hypescore = followers/Object['Hypescore_Formula']
+        print(text)
+        for word in text.split():
+            if word.find('TSLA') == -1:
+                pass
+            else:
+                print('Tesla')
 
+            if word.find('AAPL') == -1:
+                pass
+            else:
+                print('Apple')
 
+            if word.find('CRSR') == -1:
+                pass
+            else:
+                print('Corsair')
+
+            if word.find('BYND') == -1:
+                pass
+            else:
+                print('Beyond Meat')
+
+            if word.find('SPCE') == -1:
+                pass
+            else:
+                print('Virgin Galactic')
 
         return True
 
