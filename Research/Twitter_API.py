@@ -10,13 +10,22 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
 List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
+Tickers = {
+    'TSLA' : 0,
+    'AAPL' : 0
+} 
 
 
                                                                                                                                                                     
 class StdOutListener(StreamListener):
     def on_data(self, data):
         print(data)
-        global h
+
+
+
+        with open('Research/TickerScores.json', 'w') as f:
+            json.dump(Tickers, f)
+
 
 
         Object = json.loads(data)
@@ -24,36 +33,45 @@ class StdOutListener(StreamListener):
         text = (Object['text'])
         followers = user['followers_count']
         
+
         #Determining the influence factor
         with open('Configuration.json', 'r') as f:
             Data = f.read()
             Object = json.loads(Data) 
         Hypescore = followers/Object['Hypescore_Formula']
+
+
+
         print(text)
         for word in text.split():
             if word.find('TSLA') == -1:
                 pass
             else:
+                Tickers['TSLA'] = Tickers['TSLA'] + Hypescore
                 print('Tesla')
 
             if word.find('AAPL') == -1:
                 pass
             else:
+                Tickers['AAPL'] = Tickers['AAPL'] + Hypescore
                 print('Apple')
 
             if word.find('CRSR') == -1:
                 pass
             else:
+                Tickers['CRSR'] = Tickers['CRSR'] + Hypescore
                 print('Corsair')
 
             if word.find('BYND') == -1:
                 pass
             else:
+                Tickers['BYND'] = Tickers['BYND'] + Hypescore
                 print('Beyond Meat')
 
             if word.find('SPCE') == -1:
                 pass
             else:
+                Tickers['SPCE'] = Tickers['SPCE'] + Hypescore
                 print('Virgin Galactic')
 
         return True
