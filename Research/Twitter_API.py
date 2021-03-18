@@ -8,7 +8,6 @@ ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
-List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
 Tickers = {
     'TSLA' : 0,
@@ -24,8 +23,8 @@ class StdOutListener(StreamListener):
     def on_data(self, data):
         print(data)
 
-
-
+ 
+        #Refresh the 'TickerScores' File
         with open('Research/TickerScores.json', 'w') as f:
             json.dump(Tickers, f)
 
@@ -44,8 +43,10 @@ class StdOutListener(StreamListener):
         Hypescore = followers/Object['Hypescore_Formula']
 
 
-
+        #Print text of the tweet
         print(text)
+
+        #Determine what company the tweet refers to 
         for word in text.split():
 
             for Ticker in lines:
@@ -54,7 +55,7 @@ class StdOutListener(StreamListener):
                     pass
     
                 else:
-                    Tickers[Ticker] = Tickers[Ticker] + Hypescore
+                    Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
         return True
 
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
 
-    ############################################
+    #Make a list of all the ticker symbols in the 'MoreTickers' file
     with open(r'Research\MoreTickers.txt', 'r') as f:
         lines = f.readlines(1663)
 
@@ -78,7 +79,6 @@ if __name__ == "__main__":
 
 
     print(lines)
-    ############################################
 
 
 
