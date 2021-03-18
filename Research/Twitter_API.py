@@ -12,7 +12,10 @@ List = ('Tesla', 'Microsoft', 'Apple', 'Google')
 
 Tickers = {
     'TSLA' : 0,
-    'AAPL' : 0
+    'AAPL' : 0,
+    'CRSR' : 0,
+    'BYND' : 0,
+    'SPCE' : 0
 } 
 
 
@@ -44,35 +47,14 @@ class StdOutListener(StreamListener):
 
         print(text)
         for word in text.split():
-            if word.find('TSLA') == -1:
-                pass
-            else:
-                Tickers['TSLA'] = Tickers['TSLA'] + Hypescore
-                print('Tesla')
 
-            if word.find('AAPL') == -1:
-                pass
-            else:
-                Tickers['AAPL'] = Tickers['AAPL'] + Hypescore
-                print('Apple')
+            for Ticker in lines:
 
-            if word.find('CRSR') == -1:
-                pass
-            else:
-                Tickers['CRSR'] = Tickers['CRSR'] + Hypescore
-                print('Corsair')
-
-            if word.find('BYND') == -1:
-                pass
-            else:
-                Tickers['BYND'] = Tickers['BYND'] + Hypescore
-                print('Beyond Meat')
-
-            if word.find('SPCE') == -1:
-                pass
-            else:
-                Tickers['SPCE'] = Tickers['SPCE'] + Hypescore
-                print('Virgin Galactic')
+                if word.find(Ticker) == -1:
+                    pass
+    
+                else:
+                    Tickers[Ticker] = Tickers[Ticker] + Hypescore
 
         return True
 
@@ -93,11 +75,9 @@ if __name__ == "__main__":
         lines = f.readlines(1663)
 
         lines = [x.strip() for x in lines]
-        string = '#'
-        my_new_list = [string + x for x in lines]
 
 
-    print(my_new_list)
+    print(lines)
     ############################################
 
 
