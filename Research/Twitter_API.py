@@ -15,7 +15,7 @@ Tickers = {
     'AAPL' : 0
 } 
 
-#yolo
+
                                                                                                                                                                     
 class StdOutListener(StreamListener):
     def on_data(self, data):
