@@ -10,13 +10,17 @@ CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
 
-Tickers = {
-    'TSLA' : 0,
-    'AAPL' : 0,
-    'CRSR' : 0,
-    'BYND' : 0,
-    'SPCE' : 0
-} 
+
+#Make a list of all the ticker symbols in the 'MoreTickers' file
+with open(r'Research\MoreTickers.txt', 'r') as f:
+        lines = f.readlines(1663)
+
+        lines = [x.strip() for x in lines]
+
+#Create a python dictionary with the reset hypescores of all the stocks
+Tickers = {}
+for Ticker in lines:
+    Tickers[Ticker] = 0
 
 
                                                                                                                                                                     
@@ -30,7 +34,7 @@ class StdOutListener(StreamListener):
             json.dump(Tickers, f)
 
 
-
+        #Finding user data and tweet text within the json output
         Object = json.loads(data)
         user = Object['user'] 
         text = (Object['text'])
@@ -73,18 +77,12 @@ class StdOutListener(StreamListener):
     def on_error(self, status):
         print(status)
 
-
+#Authentication
 if __name__ == "__main__":
     listener = StdOutListener()
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
-
-    #Make a list of all the ticker symbols in the 'MoreTickers' file
-    with open(r'Research\MoreTickers.txt', 'r') as f:
-        lines = f.readlines(1663)
-
-        lines = [x.strip() for x in lines]
 
 
     print(lines)
