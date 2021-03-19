@@ -3,6 +3,7 @@ from tweepy import OAuthHandler
 from tweepy import Stream
 import json
 import os
+from textblob import TextBlob
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
@@ -55,7 +56,15 @@ class StdOutListener(StreamListener):
                     pass
     
                 else:
-                    Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+                    print(Ticker)
+                    if TextBlob(text).sentiment.polarity > 0: #If Sentiment is Positive
+                        Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+
+                    if TextBlob(text).sentiment.polarity < 0: #If Sentiment is Negative
+                        Tickers[Ticker] = Tickers[Ticker] - Hypescore #Subtract the Hypescore to the total
+                    
+                    if TextBlob(text).sentiment.polarity == 0: #If Sentiment is neutral
+                        Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
         return True
 
