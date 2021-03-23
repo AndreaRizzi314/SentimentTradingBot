@@ -4,11 +4,15 @@ from tweepy import Stream
 import json
 import os
 from textblob import TextBlob
+from datetime import date
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
 CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
+
+date = date.today()
+TickerFilePath = "BotData/TickerScores{Date}.json"
 
 
 #Make a list of all the ticker symbols in the 'MoreTickers' file
@@ -30,7 +34,7 @@ class StdOutListener(StreamListener):
 
  
         #Refresh the 'TickerScores' File
-        with open('Research/TickerScores.json', 'w') as f:
+        with open(TickerFilePath.format(Date = date), 'w') as f:
             json.dump(Tickers, f)
 
 
