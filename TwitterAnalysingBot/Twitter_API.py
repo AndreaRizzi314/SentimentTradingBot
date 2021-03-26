@@ -16,9 +16,9 @@ TickerFilePath = "BotData/TickerScores{Date}.json"
 
 
 #Make a list of all the ticker symbols in the 'MoreTickers' file
-with open(r'Research\MoreTickers.txt', 'r') as f:
+with open(r'TwitterAnalysingBot\MoreTickers.txt', 'r') as f:
         lines = f.readlines(1663)
-
+    
         lines = [x.strip() for x in lines]
 
 #Create a python dictionary with the reset hypescores of all the stocks
