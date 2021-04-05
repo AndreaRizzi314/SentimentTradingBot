@@ -3,15 +3,32 @@ import os
 import math
 import json
 import time
+import requests
+from datetime import date
+import sys
 
+date = date.today()
 KEY = os.environ.get('ALPACA_KEY')
 SECRET = os.environ.get('ALPACA_SECRET')
 alpaca_endpoint = "https://paper-api.alpaca.markets"
 
+Orders_url = "{}/v2/orders".format(alpaca_endpoint)
+Headers = {"APCA-API-KEY-ID": KEY, "APCA-API-SECRET-KEY": SECRET}
+TickerFilePath = "BotData/TickerScores{Date}.json"
+
+
+with open('Configuration.json', 'r') as f:
+    Data = f.read()
+    Object = json.loads(Data)
 
 #Open the TickerScores File
-with open(r'BotData\TickerScores2021-03-25.json', 'r') as f:
-    data = json.load(f)
+try:
+    with open(TickerFilePath.format(Date = date), 'r') as f:
+        data = json.load(f)
+#If there is an error with opening the new TickerScores file then end the program
+except:
+    print("\nThe TickerScores file has not been updated\n")
+    sys.exit()
 
 #Empty list 
 sorted_list_keys = []
@@ -27,11 +44,15 @@ sorted_values = sorted(value_list, reverse=True)
 for number in sorted_values:
     sorted_list_keys.append(key_list[value_list.index(number)])
 
-
 def Calculate_Quantity(price, Buying_Power):
     #How many whole shares can you buy with your money (Input: Price of one share)
-    quantity = (Buying_Power / price)
+    price = price * 0.98
+    if price == 0:
+        return 0
+    else:
+        quantity = (Buying_Power / price)
     print(quantity)
+    
     return quantity
 def Get_Buying_Power():
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
@@ -70,17 +91,27 @@ def HistoricalPrice():
     week_close = aapl_bars[-1].c
     percent_change = (week_close - week_open) / week_open * 100
     print('DBX moved {}% over the last 5 days'.format(percent_change))
-def Buy_Order(SYMBOL, QTY):
+def Buy_Order_In_Shares(SYMBOL, QTY):
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
 
-    # Submit a market order to buy 1 share of Apple at market price
+    # Submit a market order to buy 1 share of a stock at market price
     api.submit_order(
         symbol= SYMBOL,
         qty= QTY,
         side='buy',
         type='market',
-        time_in_force='gtc'
+        time_in_force='day'
     )
+def Buy_Order_In_Dollars(SYMBOL, QTY):
+    data = {
+        "symbol": SYMBOL,
+        "notional": QTY,
+        "side": "buy",
+        "type": "market",
+        "time_in_force": "day"
+    }
+
+    r = requests.post(Orders_url, json=data, headers=Headers)
 def View_Positions():
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
 
@@ -93,37 +124,198 @@ def View_Positions():
 def Live_Price(Ticker):
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
     quote = api.get_last_quote(Ticker)
+    print(quote.bidprice)
     return quote.bidprice
+def Sell_Order(SYMBOL, QTY):
+    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+
+    Percentage = str(Object['Stop_Loss'])
+
+    api.submit_order  (
+        symbol= SYMBOL,
+        qty= QTY,
+        side= "sell",
+        type= "trailing_stop",
+        trail_percent= Percentage,
+        time_in_force= "day"
+    )
+
+Buying_power = Get_Buying_Power()
+Stock_List_Position = 0
+for Stock_List_Position in range(0, Object["Diversification"]):
+    Individual_Stock_Money = float(Buying_power)/ float(Object['Diversification']) - float(.01)
+
+    Buy_Order_In_Dollars(sorted_list_keys[Stock_List_Position], Individual_Stock_Money)
+    print(Stock_List_Position) 
 
 
 
-while True:
-    if Is_Market_Open() == 0:
-        print("Market is closed....")
-    if Is_Market_Open() == 1:
-        print("Market is now open!!!")
-        while True:
+
+# if Object["Risk_Tolerance"] == 1:
+#     x = 0
+#     Individual_Stock_Money = float(Buying_power) / float(5)
+#     print(Individual_Stock_Money)
+#     for i in range(0, 5):
+#         Buy_Order_In_Dollars(sorted_list_keys[x], Individual_Stock_Money)
+#         x += 1
+    
+# if Object["Risk_Tolerance"] == 2:
+#     x = 0
+#     Individual_Stock_Money = float(Buying_power) / float(4)
+#     print(Individual_Stock_Money)
+#     for i in range(0, 4):
+#         Buy_Order_In_Dollars(sorted_list_keys[x], Individual_Stock_Money)
+#         print(x)
+#         x += 1
+    
+# if Object["Risk_Tolerance"] == 3:
+#     x = 0
+#     Individual_Stock_Money = float(Buying_power) / float(3)
+#     print(Individual_Stock_Money)
+#     for i in range(0, 3):
+#         Buy_Order_In_Dollars(sorted_list_keys[x], Individual_Stock_Money)
+#         print(x)
+#         x += 1
+
+# if Object["Risk_Tolerance"] == 4:
+#     x = 0
+#     Individual_Stock_Money = float(Buying_power) / float(2)
+#     print(Individual_Stock_Money)
+#     for i in range(0, 2):
+#         Buy_Order_In_Dollars(sorted_list_keys[x], Individual_Stock_Money)
+#         x += 1
+
+# if Object["Risk_Tolerance"] == 5:
+#     Individual_Stock_Money = Buying_power
+#     print(Individual_Stock_Money)
+#     Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+
+# if Is_Market_Open() == 0:
+#     print("Market is closed....")
+# if Is_Market_Open() == 1:
+#     print("Market is now open!!!")
+    
+# Buying_power = Get_Buying_Power()
+# print(Buying_power)
+# time.sleep(2)
+# if float(Buying_power) > float(2000):
+
+#     if Object["Risk_Tolerance"] == 1:
+
+#         Individual_Stock_Money = float(Buying_power) / float(5)
+#         print(Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[1], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[2], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[3], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[4], Individual_Stock_Money)
+        
+#     if Object["Risk_Tolerance"] == 2:
+#         Individual_Stock_Money = float(Buying_power) / float(4)
+#         print(Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[1], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[2], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[3], Individual_Stock_Money)
+        
+#     if Object["Risk_Tolerance"] == 3:
+#         Individual_Stock_Money = float(Buying_power) / float(3)
+#         print(Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[1], Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[2], Individual_Stock_Money)
+
+#     if Object["Risk_Tolerance"] == 4:
+#         Individual_Stock_Money = float(Buying_power) / float(2)
+#         print(Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+        
+#         Buy_Order_In_Dollars(sorted_list_keys[1], Individual_Stock_Money)
+
+#     if Object["Risk_Tolerance"] == 5:
+#         Individual_Stock_Money = Buying_power
+#         print(Individual_Stock_Money)
+
+#         Buy_Order_In_Dollars(sorted_list_keys[0], Individual_Stock_Money)
+
+
+
+
+
+
+
+# while True:
+#     if Is_Market_Open() == 0:
+#         print("Market is closed....")
+#     if Is_Market_Open() == 1:
+#         print("Market is now open!!!")
+#         while True:
             
-            with open('Configuration.json', 'r') as f:
-                Data = f.read()
-                Object = json.loads(Data) 
+#             with open('Configuration.json', 'r') as f:
+#                 Data = f.read()
+#                 Object = json.loads(Data) 
 
-            Buying_power = Get_Buying_Power()
+#             Buying_power = Get_Buying_Power()
+#             print(Buying_power)
+#             time.sleep(2)
+#             if float(Buying_power) > float(2000):
 
-            if Buying_power > 100:
-
-                if Object["Risk_Tolerance"] == 1:
-                    Individual_Stock_Money = Buying_power/5
+#                 if Object["Risk_Tolerance"] == 1:
                 
-                if Object["Risk_Tolerance"] == 2:
-                    Individual_Stock_Money = Buying_power/4
+#                     Individual_Stock_Money = float(Buying_power) / float(5)
+#                     print(Individual_Stock_Money)
+#                     Amount1 = Calculate_Quantity(Live_Price(sorted_list_keys[0]), Individual_Stock_Money)
+#                     if Amount1 == 0:
+#                         pass
+#                     else:
+#                         Buy_Order(sorted_list_keys[0], Amount1)
 
-                if Object["Risk_Tolerance"] == 3:
-                    Individual_Stock_Money = Buying_power/3
+#                     Amount2 = Calculate_Quantity(Live_Price(sorted_list_keys[1]), Individual_Stock_Money)
+#                     if Amount2 == 0:
+#                         pass
+#                     else:
+#                         Buy_Order(sorted_list_keys[1], Amount2)
 
-                if Object["Risk_Tolerance"] == 4:
-                    Individual_Stock_Money = Buying_power/2
+#                     Amount3 = Calculate_Quantity(Live_Price(sorted_list_keys[2]), Individual_Stock_Money)
+#                     if Amount3 == 0:
+#                         pass
+#                     else:
+#                         Buy_Order(sorted_list_keys[2], Amount3)
 
-                if Object["Risk_Tolerance"] == 5:
-                    Individual_Stock_Money = Buying_power
-    time.sleep(1)
+#                     Amount4 = Calculate_Quantity(Live_Price(sorted_list_keys[3]), Individual_Stock_Money)
+#                     if Amount4 == 0:
+#                         pass
+#                     else:
+#                         Buy_Order(sorted_list_keys[3], Amount4)
+
+#                     Amount5 = Calculate_Quantity(Live_Price(sorted_list_keys[4]), Individual_Stock_Money) 
+#                     if Amount5 == 0:
+#                         pass
+#                     else:
+#                         Buy_Order(sorted_list_keys[4], Amount5)
+#                     break
+#                 if Object["Risk_Tolerance"] == 2:
+#                     Individual_Stock_Money = Buying_power/4
+
+#                 if Object["Risk_Tolerance"] == 3:
+#                     Individual_Stock_Money = Buying_power/3
+
+#                 if Object["Risk_Tolerance"] == 4:
+#                     Individual_Stock_Money = Buying_power/2
+
+#                 if Object["Risk_Tolerance"] == 5:
+#                     Individual_Stock_Money = Buying_power
+#     time.sleep(1)
