@@ -105,7 +105,7 @@ def Buy_Order_In_Shares(SYMBOL, QTY):
         time_in_force='day'
     )
 def Buy_Order_In_Dollars(SYMBOL, QTY):
-    #Makeing a raw request for access to fractional shares  
+    #Making a raw request for access to fractional shares  
     data = {
         "symbol": SYMBOL,
         "notional": QTY,
@@ -131,7 +131,7 @@ def Live_Price(Ticker):
     return quote.bidprice
 def Sell_Order(SYMBOL, QTY):
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
-    #Makeing a trailing stop order with the target percentage listed in the configuration file
+    #Making a trailing stop order with the target percentage listed in the configuration file
     Percentage = str(Configration_Object['Stop_Loss'])
 
     api.submit_order  (
