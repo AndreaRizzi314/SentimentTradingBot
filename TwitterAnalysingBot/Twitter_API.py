@@ -12,29 +12,32 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
 
 date = date.today()
-TickerFilePath = "BotData/TickerScores{Date}.json"
-
+TickerScoresFilePath = "BotData/TickerScores{Date}.json"
+CandidateTickers = r'..\CandidateTickers.txt'
+MaxCandidateSizeBytes = 1663
+Tickers = {}
 
 #Make a list of all the ticker symbols in the 'MoreTickers' file
-with open(r'TwitterAnalysingBot\MoreTickers.txt', 'r') as f:
-        lines = f.readlines(1663)
-    
-        lines = [x.strip() for x in lines]
+with open(CandidateTickers, 'r') as f:
+    lines = f.readlines(MaxCandidateSizeBytes)
+    #Create a python dictionary with the reset hypescores of all the stocks
+    Tickers = dict.fromkeys([x.strip() for x in lines], 0)
 
-#Create a python dictionary with the reset hypescores of all the stocks
-Tickers = {}
-for Ticker in lines:
-    Tickers[Ticker] = 0
-
-
-                                                                                                                                                                    
 class StdOutListener(StreamListener):
+
+    def __init__(self, configurationFilePath):
+        #Load configuration file in memory once with the constructor.
+        with open('Configuration.json', 'r') as f:
+            Data = f.read()
+            self.Configuration_Object = json.loads(Data)
+
+        self.Hypescore_Formula = self.Configuration_Object['Hypescore_Formula']
+
     def on_data(self, data):
         print(data)
-
  
         #Update the 'TickerScores' File
-        with open(TickerFilePath.format(Date = date), 'w') as f:
+        with open(TickerScoresFilePath.format(Date = date), 'w') as f:
             json.dump(Tickers, f)
 
 
@@ -44,17 +47,13 @@ class StdOutListener(StreamListener):
         text = (Tweet_Object['text'])
         followers = user['followers_count']
         
-
-        #Determining the influence factor by finding the hypescore formula in the configuration file
-        with open('Configuration.json', 'r') as f:
-            Data = f.read()
-            Configuration_Object = json.loads(Data) 
-        Hypescore = followers/Configuration_Object['Hypescore_Formula']
-
+        #Determining the influence factor by finding the hypescore formula in the configuration        
+        Hypescore = followers/self.Hypescore_Formula 
 
         #Print text of the tweet
         print(text)
         found = False
+
         #Determine what company the tweet refers to with the first 100 characters
         for word in text.split():
 
@@ -115,7 +114,7 @@ class StdOutListener(StreamListener):
 
 #Authentication
 if __name__ == "__main__":
-    listener = StdOutListener()
+    listener = StdOutListener('Configuration.json')
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
