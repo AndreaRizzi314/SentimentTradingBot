@@ -8,18 +8,21 @@ from datetime import date
 import sys
 
 date = date.today()
+
 KEY = os.environ.get('ALPACA_KEY')
 SECRET = os.environ.get('ALPACA_SECRET')
 alpaca_endpoint = "https://paper-api.alpaca.markets"
 
 Orders_url = "{}/v2/orders".format(alpaca_endpoint)
 Headers = {"APCA-API-KEY-ID": KEY, "APCA-API-SECRET-KEY": SECRET}
+
 Bot_Data_Ticker_File_Path = "BotData/TickerScores{Date}.json"
 Daily_Log_Ticker_File_Path = "DailyLogs/Daily_Log_{Date}.txt"
 
+#Open the Configuration file
 with open('Configuration.json', 'r') as f:
     Data = f.read()
-    Object = json.loads(Data)
+    Configration_Object = json.loads(Data)
 
 #Open the TickerScores File
 try:
@@ -45,7 +48,7 @@ for number in sorted_values:
     sorted_list_keys.append(key_list[value_list.index(number)])
 
 def Calculate_Quantity(price, Buying_Power):
-    #How many whole shares can you buy with your money (Input: Price of one share)
+    #How many shares can you buy with your money (Input: Price of one share)
     price = price * 0.98
     if price == 0:
         return 0
@@ -73,7 +76,6 @@ def Is_Market_Open():
 
     # Check if the market is open now.
     clock = api.get_clock()
-    #print('The market is {}'.format('open.' if clock.is_open else 'closed.'))
     if clock.is_open:
         return 1
     else:
@@ -103,6 +105,7 @@ def Buy_Order_In_Shares(SYMBOL, QTY):
         time_in_force='day'
     )
 def Buy_Order_In_Dollars(SYMBOL, QTY):
+    #Makeing a raw request for access to fractional shares  
     data = {
         "symbol": SYMBOL,
         "notional": QTY,
@@ -127,9 +130,8 @@ def Live_Price(Ticker):
     print(quote.bidprice)
     return quote.bidprice
 def Sell_Order(SYMBOL, QTY):
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
-
-    Percentage = str(Object['Stop_Loss'])
+    #Makeing a trailing stop order with the target percentage listed in the configuration file
+    Percentage = str(Configration_Object['Stop_Loss'])
 
     api.submit_order  (
         symbol= SYMBOL,
@@ -140,16 +142,21 @@ def Sell_Order(SYMBOL, QTY):
         time_in_force= "day"
     )
 
-Buying_power = Get_Buying_Power()
-Stock_List_Position = 0
-for Stock_List_Position in range(0, Object["Diversification"]):
-    Individual_Stock_Money = float(Buying_power)/ float(Object['Diversification']) - float(.01)
 
+
+Buying_power = Get_Buying_Power() # Buying power in the account including money that can be taken out on margin
+Stock_List_Position = 0  # Position of the items in the sorted list of keys starting with the highest stock on the list 
+
+
+for Stock_List_Position in range(0, Configration_Object["Diversification"]):
+    #Dividing the total buying power by the amount of stocks that will be bought depending on the diversification.
+    Individual_Stock_Money = float(Buying_power)/ float(Configration_Object['Diversification']) - float(.01)
+    #Making a buy order for each stock
     Buy_Order_In_Dollars(sorted_list_keys[Stock_List_Position], Individual_Stock_Money)
+    #Listing the buy orders in the Daily logs 
     with open(Daily_Log_Ticker_File_Path.format(Date = date), 'a') as f:
         Read = ("\n{}\nBuy Order:{} dollars of {} stock").format(date, Individual_Stock_Money, sorted_list_keys[Stock_List_Position])
-        f.write(Read)
-    print(Stock_List_Position) 
+        f.write(Read) 
 
 
 
