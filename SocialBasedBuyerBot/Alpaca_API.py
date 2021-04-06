@@ -130,6 +130,7 @@ def Live_Price(Ticker):
     print(quote.bidprice)
     return quote.bidprice
 def Sell_Order(SYMBOL, QTY):
+    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
     #Makeing a trailing stop order with the target percentage listed in the configuration file
     Percentage = str(Configration_Object['Stop_Loss'])
 
