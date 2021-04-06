@@ -33,7 +33,7 @@ class StdOutListener(StreamListener):
         print(data)
 
  
-        #Refresh the 'TickerScores' File
+        #Update the 'TickerScores' File
         with open(TickerFilePath.format(Date = date), 'w') as f:
             json.dump(Tickers, f)
 
@@ -45,7 +45,7 @@ class StdOutListener(StreamListener):
         followers = user['followers_count']
         
 
-        #Determining the influence factor
+        #Determining the influence factor by finding the hypescore formula in the configuration file
         with open('Configuration.json', 'r') as f:
             Data = f.read()
             Configuration_Object = json.loads(Data) 
@@ -55,7 +55,7 @@ class StdOutListener(StreamListener):
         #Print text of the tweet
         print(text)
         found = False
-        #Determine what company the tweet refers to 
+        #Determine what company the tweet refers to with the first 100 characters
         for word in text.split():
 
             for Ticker in lines:
@@ -74,7 +74,8 @@ class StdOutListener(StreamListener):
                     
                     if TextBlob(text).sentiment.polarity == 0: #If Sentiment is neutral
                         Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
-        
+
+        #If the tweet couldnt be identified by the first 100 characters the extended text needs to be found  
         if found == False:
             try:
                 print("\nLooking for full tweet text under retweeted status")
