@@ -13,21 +13,27 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
 date = date.today()
 TickerScoresFilePath = "BotData/TickerScores{Date}.json"
-CandidateTickers = r'..\CandidateTickers.txt'
+CandidateTickersFilePath = 'CandidateTickers.txt'
 MaxCandidateSizeBytes = 1663
-Tickers = {}
+
 
 #Make a list of all the ticker symbols in the 'MoreTickers' file
-with open(CandidateTickers, 'r') as f:
+with open(CandidateTickersFilePath, 'r') as f:
     lines = f.readlines(MaxCandidateSizeBytes)
-    #Create a python dictionary with the reset hypescores of all the stocks
-    Tickers = dict.fromkeys([x.strip() for x in lines], 0)
+    
+    Candidate_Tickers = [x.strip() for x in lines]
+
+#Create a python dictionary with the reset hypescores of all the stocks
+Tickers = {}
+for Ticker in Candidate_Tickers:
+    Tickers[Ticker] = 0
+
 
 class StdOutListener(StreamListener):
 
     def __init__(self, configurationFilePath):
         #Load configuration file in memory once with the constructor.
-        with open('Configuration.json', 'r') as f:
+        with open(configurationFilePath, 'r') as f:
             Data = f.read()
             self.Configuration_Object = json.loads(Data)
 
@@ -57,7 +63,7 @@ class StdOutListener(StreamListener):
         #Determine what company the tweet refers to with the first 100 characters
         for word in text.split():
 
-            for Ticker in lines:
+            for Ticker in Candidate_Tickers:
 
                 if word.find(Ticker) == -1:
                     pass
@@ -65,13 +71,14 @@ class StdOutListener(StreamListener):
                 else:
                     print("\nThis tweet is talking about", Ticker)
                     found = True
-                    if TextBlob(text).sentiment.polarity > 0: #If Sentiment is Positive
+                    Tweet_Sentiment = TextBlob(text).sentiment.polarity
+                    if Tweet_Sentiment > 0: #If Sentiment is Positive
                         Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
-                    if TextBlob(text).sentiment.polarity < 0: #If Sentiment is Negative
+                    if Tweet_Sentiment < 0: #If Sentiment is Negative
                         Tickers[Ticker] = Tickers[Ticker] - Hypescore #Subtract the Hypescore to the total
                     
-                    if TextBlob(text).sentiment.polarity == 0: #If Sentiment is neutral
+                    if Tweet_Sentiment == 0: #If Sentiment is neutral
                         Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
         #If the tweet couldnt be identified by the first 100 characters the extended text needs to be found  
@@ -89,7 +96,7 @@ class StdOutListener(StreamListener):
                     return
             for word in full_text.split():
 
-                for Ticker in lines:
+                for Ticker in Candidate_Tickers:
 
                     if word.find(Ticker) == -1:
                         pass
@@ -97,13 +104,14 @@ class StdOutListener(StreamListener):
                     else:
                         print("\nThis tweet is talking about", Ticker)
                         found = True
-                        if TextBlob(text).sentiment.polarity > 0: #If Sentiment is Positive
+                        Tweet_Sentiment = TextBlob(full_text).sentiment.polarity
+                        if Tweet_Sentiment > 0: #If Sentiment is Positive
                             Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
-                        if TextBlob(text).sentiment.polarity < 0: #If Sentiment is Negative
+                        if Tweet_Sentiment < 0: #If Sentiment is Negative
                             Tickers[Ticker] = Tickers[Ticker] - Hypescore #Subtract the Hypescore to the total
                         
-                        if TextBlob(text).sentiment.polarity == 0: #If Sentiment is neutral
+                        if Tweet_Sentiment == 0: #If Sentiment is neutral
                             Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
 
 
@@ -120,9 +128,9 @@ if __name__ == "__main__":
     stream = Stream(auth, listener)
 
 
-    print(lines)
+    print(Candidate_Tickers)
 
 
 
 
-    stream.filter(track=lines)
+    stream.filter(track=Candidate_Tickers)
