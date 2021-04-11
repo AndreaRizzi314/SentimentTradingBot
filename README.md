@@ -19,3 +19,10 @@ With the list of all the stockmarket ticker symbols, this bot will randomly choo
 
 ### Social based buyer bot
 Using the information that was gathered with the Twitter Analyser Bot. This bot will read the 'TickerScore' file and buy the most 'hyped' stocks and diversify depending on the risk tollerence declared in the configuration file.
+
+
+
+
+
+### Known issues:
+1. At the moment I cannot deal with tweets that have imbeded references to other tweets. For now, those tweets are ignored
