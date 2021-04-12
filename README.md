@@ -26,3 +26,5 @@ Using the information that was gathered with the Twitter Analyser Bot. This bot 
 
 ### Known issues:
 1. At the moment I cannot deal with tweets that have imbeded references to other tweets. For now, those tweets are ignored
+2. Some tweets given by the api are in different languages and cannot be translated at the moment, these tweets will also be ignored
+3. On occasion, twitter gives the bot tweets that have nothing to do with the keywords that were provided
