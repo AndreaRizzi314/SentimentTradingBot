@@ -49,11 +49,10 @@ for number in sorted_values:
 
 def Calculate_Quantity(price, Buying_Power):
     #How many shares can you buy with your money (Input: Price of one share)
-    price = price * 0.98
     if price == 0:
         return 0
     else:
-        quantity = (Buying_Power / price)
+        quantity = math.floor(Buying_Power / price)
     print(quantity)
     
     return quantity
@@ -124,11 +123,11 @@ def View_Positions():
     # Print the quantity of shares for each position.
     for position in portfolio:
         print("{} shares of {}".format(position.qty, position.symbol))
-def Live_Price(Ticker):
+def Live_Price(symbol):
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
-    quote = api.get_last_quote(Ticker)
-    print(quote.bidprice)
-    return quote.bidprice
+    symbol_bars = api.get_barset(symbol, 'minute', 1).df.iloc[0]
+    symbol_price = symbol_bars[symbol]['close']
+    return symbol_price
 def Sell_Order(SYMBOL, QTY):
     api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
     #Making a trailing stop order with the target percentage listed in the configuration file
@@ -144,21 +143,23 @@ def Sell_Order(SYMBOL, QTY):
     )
 
 
-
-Buying_power = Get_Buying_Power() # Buying power in the account including money that can be taken out on margin
 Stock_List_Position = 0  # Position of the items in the sorted list of keys starting with the highest stock on the list 
+Diversification = Configration_Object["Diversification"]
 
-
-for Stock_List_Position in range(0, Configration_Object["Diversification"]):
+for Stock_List_Position in range(0, Diversification):
+    Buying_power = Get_Buying_Power() #Buying power in the account including money that can be taken out on margin
     #Dividing the total buying power by the amount of stocks that will be bought depending on the diversification.
-    Individual_Stock_Money = float(Buying_power)/ float(Configration_Object['Diversification']) - float(.01)
+    Individual_Stock_Money = float(Buying_power)/ float(Diversification) - float(.01)
+
+    SYMBOL = sorted_list_keys[Stock_List_Position]
+    Price = Live_Price(SYMBOL)
+    QTY = Calculate_Quantity(Price, Individual_Stock_Money) 
+
     #Making a buy order for each stock
-    Buy_Order_In_Dollars(sorted_list_keys[Stock_List_Position], Individual_Stock_Money)
-    #Listing the buy orders in the Daily logs 
-    with open(Daily_Log_Ticker_File_Path.format(Date = date), 'a') as f:
-        Read = ("\n{}\nBuy Order:{} dollars of {} stock").format(date, Individual_Stock_Money, sorted_list_keys[Stock_List_Position])
-        f.write(Read) 
-
-
-
-
+    Buy_Order_In_Shares(SYMBOL, QTY)
+    #Waiting for the order to be filled
+    time.sleep(1)
+    #Making a sell order for each stock
+    Sell_Order(SYMBOL, QTY)
+    #Changing diversification for how many stocks are left to buy
+    Diversification = Diversification - 1
