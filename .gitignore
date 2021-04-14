@@ -1,7 +1,6 @@
 .vscode
 BotData
 DailyLogs
-TwitterAnalysingBot.py
 CandidateTickers.txt
 InitialConfiguration.py
 Configuration.json
