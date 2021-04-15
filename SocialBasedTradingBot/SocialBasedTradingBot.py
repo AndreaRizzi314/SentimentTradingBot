@@ -20,7 +20,7 @@ Bot_Data_Ticker_File_Path = "BotData/TickerScores{Date}.json"
 Daily_Log_Ticker_File_Path = "DailyLogs/Daily_Log_{Date}.txt"
 
 #Open the Configuration file
-with open('Configuration.json', 'r') as f:
+with open('..\Configuration.json', 'r') as f:
     Data = f.read()
     Configration_Object = json.loads(Data)
 
