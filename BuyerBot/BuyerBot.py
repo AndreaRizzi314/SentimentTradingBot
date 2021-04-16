@@ -6,6 +6,7 @@ import time
 import requests
 from datetime import date
 import sys
+import random
 
 date = date.today()
 
@@ -19,33 +20,59 @@ Headers = {"APCA-API-KEY-ID": KEY, "APCA-API-SECRET-KEY": SECRET}
 Bot_Data_Ticker_File_Path = "BotData/TickerScores{Date}.json"
 Daily_Log_Ticker_File_Path = "DailyLogs/Daily_Log_{Date}.txt"
 
+
+
 #Open the Configuration file
-with open('..\Configuration.json', 'r') as f:
+with open('Configuration.json', 'r') as f:
     Data = f.read()
     Configration_Object = json.loads(Data)
 
-#Open the TickerScores File
-try:
-    with open(Bot_Data_Ticker_File_Path.format(Date = date), 'r') as f:
-        data = json.load(f)
-#If there is an error with opening the new TickerScores file then end the program
-except:
-    print("\nThe TickerScores file has not been updated\n")
-    sys.exit()
+def Get_Stocks():
+    try:
+        strategy = sys.argv[1]
 
-#Empty list 
-sorted_list_keys = []
+        if strategy == "Social":
+            return Social_Strategy()
+        if strategy == "Random":
+            return Random_Strategy()
+    except:
+        pass
+    print("That was not a correct value, Social or Random?")
+    sys.exit(0)
 
-#Seperate List for the values and the keys within the dictionary
-key_list = list(data.keys())
-value_list = list(data.values())
+def Social_Strategy():
+    #Open the TickerScores File
+    try:
+        with open(Bot_Data_Ticker_File_Path.format(Date = date), 'r') as f:
+            data = json.load(f)
+    #If there is an error with opening the new TickerScores file then end the program
+    except:
+        print("\nThe TickerScores file has not been updated\n")
+        sys.exit()
 
-#sorted list of values
-sorted_values = sorted(value_list, reverse=True)
+    #Empty list 
+    sorted_list_keys = []
 
-#sorted list of Keys
-for number in sorted_values:
-    sorted_list_keys.append(key_list[value_list.index(number)])
+    #Seperate List for the values and the keys within the dictionary
+    key_list = list(data.keys())
+    value_list = list(data.values())
+
+    #sorted list of values
+    sorted_values = sorted(value_list, reverse=True)
+
+    #sorted list of Keys
+    for number in sorted_values:
+        sorted_list_keys.append(key_list[value_list.index(number)])
+
+    return sorted_list_keys
+
+
+def Random_Strategy():
+    Sorted_Stocks = Social_Strategy()
+    random.shuffle(Sorted_Stocks)
+    return Sorted_Stocks
+
+
 
 def Calculate_Quantity(price, Buying_Power):
     #How many shares can you buy with your money (Input: Price of one share)
@@ -149,7 +176,8 @@ def Sell_Order(SYMBOL, QTY):
         trail_percent= Percentage,
         time_in_force= "gtc"
     )
-        
+
+sorted_list_keys = Get_Stocks()
 
 Diversification = Configration_Object["Diversification"]
 Number_Of_Current_Positions = Amount_Of_Positions()
@@ -201,7 +229,6 @@ for i in range(0, Positions_Left_To_Buy):
             break
 
 
-print(Stock_List_Position)
 
 Diversification = Configration_Object["Diversification"]
 Number_of_Stocks = len(sorted_list_keys)
