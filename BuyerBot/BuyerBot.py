@@ -188,7 +188,7 @@ def Sell_Order(SYMBOL, QTY):
         time_in_force= "gtc"
     )
 
-
+# This is the new branch
 
 
 Diversification = Configration_Object["Diversification"]
