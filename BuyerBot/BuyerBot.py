@@ -15,7 +15,7 @@ SECRET = os.environ.get('ALPACA_SECRET')
 alpaca_endpoint = "https://paper-api.alpaca.markets"
 
 Orders_url = "{}/v2/orders".format(alpaca_endpoint)
-Headers = {"APCA-API-KEY-ID": KEY, "APCA-API-SECRET-KEY": SECRET}
+
 
 Bot_Data_Ticker_File_Path = "BotData/TickerScores{Date}.json"
 Daily_Log_Ticker_File_Path = "DailyLogs/Daily_Log_{Date}.txt"
@@ -32,8 +32,15 @@ def Get_Stocks():
         strategy = sys.argv[1]
 
         if strategy == "Social":
+            #Make variables with the right key and secret depending on the strategy
+            Get_Stocks.KEY = os.environ.get('SOCIAL_BASED_ALPACA_KEY')
+            Get_Stocks.SECRET = os.environ.get('SOCIAL_BASED_ALPACA_SECRET')
             return Social_Strategy()
+
         if strategy == "Random":
+            #Make variables with the right key and secret depending on the strategy
+            Get_Stocks.KEY = os.environ.get('RANDOM_ALPACA_KEY')
+            Get_Stocks.SECRET = os.environ.get('RANDOM_ALPACA_SECRET')
             return Random_Strategy()
     except:
         pass
@@ -63,16 +70,20 @@ def Social_Strategy():
     #sorted list of Keys
     for number in sorted_values:
         sorted_list_keys.append(key_list[value_list.index(number)])
-
+    #Return the sorted list of ticker symbols
     return sorted_list_keys
 
 
 def Random_Strategy():
     Sorted_Stocks = Social_Strategy()
+    #Shuffle the list 
     random.shuffle(Sorted_Stocks)
+    #Return the list of sorted stocks that have been randomised 
     return Sorted_Stocks
 
-
+sorted_list_keys = Get_Stocks()
+# Find the Key and secret for the account depending on the Strategy
+Headers = {"APCA-API-KEY-ID": Get_Stocks.KEY, "APCA-API-SECRET-KEY": Get_Stocks.SECRET}
 
 def Calculate_Quantity(price, Buying_Power):
     #How many shares can you buy with your money (Input: Price of one share)
@@ -84,7 +95,7 @@ def Calculate_Quantity(price, Buying_Power):
     
     return quantity
 def Get_Buying_Power():
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Get account information.
     account = api.get_account()
@@ -98,7 +109,7 @@ def Get_Buying_Power():
     return(account.buying_power)
 def Is_Market_Open():
 
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Check if the market is open now.
     clock = api.get_clock()
@@ -108,7 +119,7 @@ def Is_Market_Open():
         return 0
 def HistoricalPrice():
 
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Get daily price data for AAPL over the last 5 trading days.
     barset = api.get_barset('AAPL', 'day', limit=5)
@@ -120,7 +131,7 @@ def HistoricalPrice():
     percent_change = (week_close - week_open) / week_open * 100
     print('AAPL moved {}% over the last 5 days'.format(percent_change))
 def Buy_Order_In_Shares(SYMBOL, QTY):
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Submit a market order to buy 1 share of a stock at market price
     api.submit_order(
@@ -142,14 +153,14 @@ def Buy_Order_In_Dollars(SYMBOL, QTY):
 
     r = requests.post(Orders_url, json=data, headers=Headers)
 def Get_Portfolio():
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Get a list of all of our positions.
     portfolio = api.list_positions()
      
     return portfolio
 def Amount_Of_Positions():
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
 
     # Get a list of all of our positions.
     portfolio = api.list_positions()
@@ -159,12 +170,12 @@ def Amount_Of_Positions():
         Number_Of_Positions += 1
     return Number_Of_Positions
 def Live_Price(symbol):
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
     symbol_bars = api.get_barset(symbol, 'minute', 1).df.iloc[0]
     symbol_price = symbol_bars[symbol]['close']
     return symbol_price
 def Sell_Order(SYMBOL, QTY):
-    api = Trade_api.REST(KEY, SECRET, alpaca_endpoint)
+    api = Trade_api.REST(Get_Stocks.KEY, Get_Stocks.SECRET, alpaca_endpoint)
     #Making a trailing stop order with the target percentage listed in the configuration file
     Percentage = str(Configration_Object['Stop_Loss'])
 
@@ -177,7 +188,8 @@ def Sell_Order(SYMBOL, QTY):
         time_in_force= "gtc"
     )
 
-sorted_list_keys = Get_Stocks()
+
+
 
 Diversification = Configration_Object["Diversification"]
 Number_Of_Current_Positions = Amount_Of_Positions()
