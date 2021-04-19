@@ -15,8 +15,8 @@ CONSUMER_SECRET = os.environ.get('CONSUMER_SECRET')
 
 
 date = date.today()
-TickerScoresFilePath = "BotData/TickerScores{Date}.json"
-CandidateTickersFilePath = 'CandidateTickers.txt'
+TickerScoresFilePath = r"C:\repos\SentimentTradingBot\BotData\TickerScores{Date}.json"
+CandidateTickersFilePath = r'C:\repos\SentimentTradingBot\CandidateTickers.txt'
 MaxCandidateSizeBytes = 1663
 
 
@@ -162,7 +162,7 @@ class StdOutListener(StreamListener):
 
 #Authentication
 if __name__ == "__main__":
-    listener = StdOutListener('Configuration.json')
+    listener = StdOutListener(r'C:\repos\SentimentTradingBot\Configuration.json')
     auth = OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
     auth.set_access_token(ACCESS_TOKEN, ACCESS_TOKEN_SECRET)
     stream = Stream(auth, listener)
