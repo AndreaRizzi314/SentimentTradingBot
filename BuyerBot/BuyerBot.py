@@ -57,12 +57,24 @@ def Social_Strategy():
         print("\nThe TickerScores file has not been updated\n")
         sys.exit()
 
+
+    #How many objects are in the file?
+    x = 0
+    for object in data:
+        x += 1
+
+    dict = {}
+    for i in range(0, x):
+        symbol = data[i]["symbol"]
+        average = data[i]["average"]
+        dict[symbol] = average
+
     #Empty list 
     sorted_list_keys = []
 
     #Seperate List for the values and the keys within the dictionary
-    key_list = list(data.keys())
-    value_list = list(data.values())
+    key_list = list(dict.keys())
+    value_list = list(dict.values())
 
     #sorted list of values
     sorted_values = sorted(value_list, reverse=True)
@@ -188,7 +200,7 @@ def Sell_Order(SYMBOL, QTY):
         time_in_force= "gtc"
     )
 
-
+# This is the new branch
 
 
 Diversification = Configration_Object["Diversification"]

@@ -5,6 +5,9 @@ import json
 import os
 from textblob import TextBlob
 from datetime import date
+import sys
+import time
+timeout = time.time() + 60*10
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
@@ -23,10 +26,46 @@ with open(CandidateTickersFilePath, 'r') as f:
     
     Candidate_Tickers = [x.strip() for x in lines]
 
-#Create a python dictionary with the reset hypescores of all the stocks
-Tickers = {}
-for Ticker in Candidate_Tickers:
-    Tickers[Ticker] = 0
+
+
+
+
+class Company():
+    def __init__(self, symbol, hypescore, amount_of_tweets):
+        self.hypescore = hypescore
+        self.amount_of_tweets = amount_of_tweets
+        self.symbol = symbol
+        self.average = hypescore/amount_of_tweets
+    
+    def increase_hypescore(self, hypescore):
+        self.hypescore += hypescore
+        self.amount_of_tweets += 1
+        self.average = self.hypescore/self.amount_of_tweets
+
+    def decrease_hypescore(self, hypescore):
+        self.hypescore -= hypescore
+        self.amount_of_tweets += 1
+        self.average = self.hypescore/self.amount_of_tweets
+
+    
+Company_Object_array = []
+position_in_array = 0
+Tickers_Position_Dictionary = {}
+
+for ticker in Candidate_Tickers:
+    Company_Object_array.append(Company(ticker, 1, 1))
+    Tickers_Position_Dictionary[ticker] = position_in_array
+    position_in_array += 1
+
+    
+
+
+
+
+
+
+
+
 
 
 class StdOutListener(StreamListener):
@@ -41,10 +80,18 @@ class StdOutListener(StreamListener):
 
     def on_data(self, data):
         print(data)
- 
+        if time.time() > timeout:
+            sys.exit()
+            
         #Update the 'TickerScores' File
         with open(TickerScoresFilePath.format(Date = date), 'w') as f:
-            json.dump(Tickers, f)
+            json.dump([object.__dict__ for object in Company_Object_array], f)
+                
+                
+
+        
+               
+
 
 
         #Finding user data and tweet text within the json output
@@ -64,13 +111,17 @@ class StdOutListener(StreamListener):
 
             Tweet_Sentiment = TextBlob(text).sentiment.polarity
             if Tweet_Sentiment > 0: #If Sentiment is Positive
-                Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+                # Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+                Company_Object_array[Tickers_Position_Dictionary[Ticker]].increase_hypescore(Hypescore)
+
 
             if Tweet_Sentiment < 0: #If Sentiment is Negative
-                Tickers[Ticker] = Tickers[Ticker] - Hypescore #Subtract the Hypescore to the total
+                #Tickers[Ticker] = Tickers[Ticker] - Hypescore #Subtract the Hypescore to the total
+                Company_Object_array[Tickers_Position_Dictionary[Ticker]].decrease_hypescore(Hypescore)
             
             if Tweet_Sentiment == 0: #If Sentiment is neutral
-                Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+                #Tickers[Ticker] = Tickers[Ticker] + Hypescore #Add the Hypescore to the total
+                Company_Object_array[Tickers_Position_Dictionary[Ticker]].increase_hypescore(Hypescore)
 
 
         #Print text of the tweet
@@ -121,3 +172,5 @@ if __name__ == "__main__":
 
 
     stream.filter(track=Candidate_Tickers)
+
+print("done")
