@@ -7,7 +7,7 @@ from textblob import TextBlob
 from datetime import date
 import sys
 import time
-timeout = time.time() + 60*120
+timeout = time.time() + 60*180
 ACCESS_TOKEN = os.environ.get('ACCESS_TOKEN')
 ACCESS_TOKEN_SECRET = os.environ.get('ACCESS_TOKEN_SECRET')
 CONSUMER_KEY = os.environ.get('CONSUMER_KEY')
