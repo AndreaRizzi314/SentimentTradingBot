@@ -10,8 +10,6 @@ import random
 
 date = date.today()
 
-KEY = os.environ.get('ALPACA_KEY')
-SECRET = os.environ.get('ALPACA_SECRET')
 alpaca_endpoint = "https://paper-api.alpaca.markets"
 
 Orders_url = "{}/v2/orders".format(alpaca_endpoint)
@@ -208,6 +206,7 @@ Number_Of_Current_Positions = Amount_Of_Positions()
 Number_Of_Desired_Positions = Diversification
 Positions_Left_To_Buy = Number_Of_Desired_Positions - Number_Of_Current_Positions
 
+Stock_List_Position = 0  # Position of the items in the sorted list of keys, always starts from the top
 
 for i in range(0, Positions_Left_To_Buy):
     Buying_power = Get_Buying_Power() #Buying power in the account including money that can be taken out on margin
@@ -215,7 +214,7 @@ for i in range(0, Positions_Left_To_Buy):
     #Dividing the total buying power by the amount of stocks that will be bought depending on the diversification.
     Individual_Stock_Money = float(Buying_power)/ float(Positions_Left_To_Buy)* 0.995
 
-    Stock_List_Position = 0  # Position of the items in the sorted list of keys, always starts from the top
+    
 
     while True:
 
@@ -246,7 +245,7 @@ for i in range(0, Positions_Left_To_Buy):
             #Making a buy order for each stock
             Buy_Order_In_Shares(Symbol_To_Evaluate_Buying, QTY)
             #Waiting for the order to be filled
-            time.sleep(10)
+            time.sleep(5)
             #Making a sell order for each stock
             Sell_Order(Symbol_To_Evaluate_Buying, QTY)
             Positions_Left_To_Buy -= 1
@@ -313,7 +312,7 @@ while True:
                     #Making a buy order for each stock
                     Buy_Order_In_Shares(Symbol_To_Evaluate_Buying, QTY)
                     #Waiting for the order to be filled
-                    time.sleep(10)
+                    time.sleep(5)
                     #Making a sell order for each stock
                     Sell_Order(Symbol_To_Evaluate_Buying, QTY)
                     #After Buying reduce the amount of positions that are needed to be filled by 1 
