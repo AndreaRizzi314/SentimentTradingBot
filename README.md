@@ -41,10 +41,14 @@ Replace the following with your appropriate paths:
 ### Environment Variables 
 The access token and access token secret for the twitter api are under the names: ACCESS_TOKEN & ACCESS_TOKEN_SECRET\
 The consumer key and consumer secret are also under the names: CONSUMER_KEY & CONSUMER_SECRET\
+
 \
 For this project I made two accounts with Alpaca so that I could use both the random and social based bots to compare them. The names of these environment variables are as follows:\
 RANDOM_ALPACA_KEY & RANDOM_ALPACA_SECRET\
 SOCIAL_BASED_ALPACA_KEY & SOCIAL_BASED_ALPACA_SECRET
+
+To obtain your own credentials for the Twitter Api go to: <https://developer.twitter.com/en>\
+To obtain your own credentials for the Alpaca Api go to: <https://alpaca.markets/>
 
 ### Known issues:
 1. At the moment I cannot deal with tweets that have imbeded references to other tweets. For now, those tweets are ignored
