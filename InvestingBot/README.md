@@ -1,1 +1,3 @@
-### To be written
+### The tickers used in the Investing bot are the symbols that are in the 'CandidateTickers' file. You are able to change the targeted stocks by just replacing the existing symbols with different ones. 
+### The 'AllTickers' file contains all the listings within the NASDAQ and are all accepted by the Alpaca brockerage.
+### You can change the configuration file manually or use the initial configuration program and change the dictionary.
