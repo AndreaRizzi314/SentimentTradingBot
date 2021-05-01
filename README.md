@@ -21,7 +21,7 @@ Diversification is declared in the Configuration file and is followed by both th
 \
 The Investing Bot also places a Trailing Stop-Loss after placing a buy order. A trailing stop-loss increases as the price of a stock increases but if the stock goes below a certain threshold it will sell. This is used to maximise our profits
 
-### Launching the Investing bot
+#### Launching the Investing bot
 To launch the investing bot in Random mode, execute the following command at the command line:
 ```
 <Python Install Folder path>/python.exe <repo clone folder path>/SentimentTradingBot/InvestingBot/InvestingBot.py Random
@@ -37,7 +37,7 @@ Replace the following with your appropriate paths:
 ```<Python Install Folder path>``` should be the path where you installed Python
 
 ```<repo clone folder path>``` should be the path where you cloned the project repo
-
+## Prerequesites
 ### Environment Variables 
 The access token and access token secret for the twitter api are under the names: ACCESS_TOKEN & ACCESS_TOKEN_SECRET\
 The consumer key and consumer secret are also under the names: CONSUMER_KEY & CONSUMER_SECRET\
@@ -49,8 +49,26 @@ SOCIAL_BASED_ALPACA_KEY & SOCIAL_BASED_ALPACA_SECRET
 
 To obtain your own credentials for the Twitter Api go to: <https://developer.twitter.com/en>\
 To obtain your own credentials for the Alpaca Api go to: <https://alpaca.markets/>
-
-### Known issues:
+### Modules
+There are some modules that are needed that dont come as default in python:\
+\
+**Alpaca_trade_api:**
+```
+pip install alpaca_trade_api
+```
+**Tweepy:**
+```
+pip install tweepy
+```
+**Requests:**
+```
+pip install requests
+```
+**Textblob:**
+```
+pip install textblob
+```
+## Known issues:
 1. At the moment I cannot deal with tweets that have imbeded references to other tweets. For now, those tweets are ignored
 2. Some tweets given by the api are in different languages and cannot be translated at the moment, these tweets will also be ignored
 3. On occasion, twitter gives the bot tweets that have nothing to do with the keywords that were provided
